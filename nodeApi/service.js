@@ -1,15 +1,12 @@
 const mongo = require("mongodb").MongoClient;
 const express = require("express");
-var http = require('http').createServer(express);
-const multer = require("multer");
+const app = express();
+const server = require("http").Server(app);
+const io = require("socket.io")(server);
 const bodyParser = require("body-parser");
 const ObjectID = require('mongodb').ObjectID;
-var io = require('socket.io')(http);
 
-
-const upload = multer({ dest: "uploads/" });
 const router = express.Router();
-const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -32,7 +29,6 @@ const main = () => {
     },
     (err, client) => {
       if (err) {
-        console.error(err);
         return;
       }
       db = client.db("Main"); //MongoClient.connect();
@@ -51,7 +47,6 @@ router
         .toArray();
       return res.json(total);
     } catch (e) {
-      console.log(e);
       res.json(e);
     }
   })
@@ -66,7 +61,6 @@ router
             console.log(res.result.nModified + " document(s) updated");
           });
       } catch (e) {
-        console.log(e);
         res.json(e);
       }
     res.send("Update the book");
@@ -74,10 +68,16 @@ router
 
 app.use("/", router);
 
-io.on('connection', function(socket){
-  console.log('a user connected');
+io.on("connection", socket => {
+  const { id } = socket.client;
+  console.log(`User connected: ${id}`);
+  socket.on("chat message", msg => {
+    console.log(`${id}: ${msg}`);
+    io.emit("chat message", msg);
+  });
 });
 
-app.listen(8080, () => {
+
+server.listen(8081, () => {
   console.log("Example app listening on port 8000!");
 });
