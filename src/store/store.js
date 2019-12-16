@@ -1,4 +1,4 @@
-function reducer(state = { dialog: false }, action) {
+function reducer(state = false, action) {
     switch (action.type) {
       case "OPEN_DIALOG":
         return {

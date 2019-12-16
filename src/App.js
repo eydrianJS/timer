@@ -14,8 +14,7 @@ const socket = io.connect("http://localhost:8081");
 function App() {
   const [time, setTime] = useState();
   const [startTime, setStartTime] = useState(new Date().getTime());
-  const [chat, setChat] = useState({ id: "sadsad", msg: "sadsa" });
-  const counter = useSelector(state => state);
+  const dialog = useSelector(state => state);
   const dispatch = useDispatch();
 
   const updateStartDate = e => {
@@ -34,7 +33,7 @@ function App() {
     });
   };
   const updateSocket = e => {
-    socket.emit("chat message", "Raz dwa trzy");
+    socket.emit("openDialog");
   };
 
   useEffect(() => {
@@ -44,15 +43,13 @@ function App() {
   }, []);
 
   useEffect(() => {
-    socket.on("chat message", msg => {
-      console.log(msg);
+    socket.on("openDialog", () => {
       // Add new messages to existing messages in "chat"
       dispatch({
         type: "OPEN_DIALOG"
       });
-      setChat(msg);
     });
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     function time(ms) {
@@ -81,13 +78,11 @@ function App() {
 
   return (
     <div className="App async-status-wrapper">
-      {counter.dialog ? <AlertDialog socket={socket}/> : false}
+      {dialog ? <AlertDialog socket={socket}/> : false}
       <Card>
         <Card.Body>
           <Card.Title>Czas od znalezienia ostatniego buga</Card.Title>
           <h1 style={{ color: "green" }}>{time}</h1>
-          <h1>{chat.id + "" + chat.msg}</h1>
-          <h1>{counter.num}</h1>
           <Button onClick={e => updateStartDate(e)}> I znowu jebło!! </Button>
           <Button onClick={e => updateSocket(e)}> !!! </Button>
         </Card.Body>
