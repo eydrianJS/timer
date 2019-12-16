@@ -44,7 +44,6 @@ function App() {
 
   useEffect(() => {
     socket.on("openDialog", () => {
-      // Add new messages to existing messages in "chat"
       dispatch({
         type: "OPEN_DIALOG"
       });
