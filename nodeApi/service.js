@@ -70,9 +70,22 @@ app.use("/", router);
 
 io.on("connection", socket => {
   const { id } = socket.client;
-  console.log(`User connected: ${id}`);
-  socket.on("openDialog", () => {
-    io.emit("openDialog");
+  socket.on("openDialog", async (openDialog) => {
+    let newState = {...openDialog}
+    if(openDialog.agree) {
+      let query = { "_id":  new ObjectID("5df3411dfc110efe30d47891")} ;
+      const set = {creator: "new Creator", startTime: new Date().toISOString()}
+      let newVal = {$set: set};
+      let total = await db
+        .collection("timer")
+        .updateOne(query,newVal , function(err, res) {
+          if (err) throw err;
+          console.log(res.result.nModified + " document(s) updated");
+        });
+        newState =  {...newState, ...set};
+    }
+    console.log(newState);
+    io.emit("openDialog", newState);
   });
 });
 

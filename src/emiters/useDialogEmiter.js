@@ -15,7 +15,7 @@ const useDialogEmiter = () => {
     });
 
     const openDialog = e => {
-      socket.emit("chat message", true);
+      socket.emit("chat message", {openDialog: true, agree: true});
     };
 
     return () => {
